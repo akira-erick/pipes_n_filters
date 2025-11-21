@@ -1,7 +1,15 @@
 @startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
+LAYOUT_TOP_DOWN()
+
+
+Person(user, "User", "Uploads images and views results.")
+
+System(imageSystem, "Distributed Image Processing System", "Processes images through a pipeline of filters and stores the final output.")
+
+Rel(user, imageSystem, "Uploads images", "HTTP")
+Rel(imageSystem, user, "Provides processed image", "HTTP")
 
 SHOW_LEGEND()
-
 @enduml
