@@ -1,9 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { RunRequest } from './types';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  private readonly port: number
+
+  constructor(private configService: ConfigService) {
+    this.port = this.configService.get<number>('NEXT_PIPE_PORT') || 3002;
+  }
+
+  run(body: RunRequest): string {
+
+    const type = body.processingType;
+    let parameter: number;
+
+    switch (type) {
+      case 'light':
+        parameter = 150;
+        break;
+      case 'medium':
+        parameter = 300;
+        break;
+      case 'heavy':
+        parameter = 600;
+        break;
+      default:
+        parameter = 150;
+    }
+
+    const processed =  this.heavyMatrixMultiply(parameter)
+
+    fetch(`http://ai-service:${this.port}/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({processingType: type}),
+    }).catch(() => {});
+
+    return 'sent';
   }
 
   private heavyMatrixMultiply(size: number): number[][] {
