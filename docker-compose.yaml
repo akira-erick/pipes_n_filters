@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  preprocessing-filter:
+    build: ./preprocessing_filter
+    container_name: preprocessing-filter
+    environment:
+      SERVICE_PORT: 4001
+      NEXT_PIPE_PORT: 4002
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    ports:
+      - "4001:4001"
+    networks:
+      - filters
+    depends_on:
+      - otel-collector
+      - transformation-filter
+
+  transformation-filter:
+    build: ./transformation_filter
+    container_name: transformation-filter
+    environment:
+      SERVICE_PORT: 4002
+      NEXT_PIPE_PORT: 4003
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    ports:
+      - "4002:4002"
+    networks:
+      - filters
+    depends_on:
+      - otel-collector
+      - ai-filter
+
+  ai-filter:
+    build: ./ai_filter
+    container_name: ai-filter
+    environment:
+      SERVICE_PORT: 4003
+      NEXT_PIPE_PORT: ""
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    ports:
+      - "4003:4003"
+    networks:
+      - filters
+    depends_on:
+      - otel-collector
+
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4318:4318"
+      - "9464:9464"
+    networks:
+      - filters
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    container_name: jaeger
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "9411:9411"     # Zipkin endpoint
+    command: ["--collector.zipkin.host-port=:9411"]
+    networks: 
+      - filters
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks: 
+      - filters
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks: 
+      - filters
+
+networks:
+  filters:
+    driver: bridge

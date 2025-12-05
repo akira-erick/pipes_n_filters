@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import type { RunRequest } from './types';
 
 //Gaussian Kernel Generation
 /*
@@ -12,8 +13,11 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('/run')
+    async run(@Body() body: RunRequest) {
+    console.log('Running preprocessing_filter with type:', body.processingType);
+    this.appService.run(body);
+    console.log('preprocessing_filter run completed');
+    return { received: true };
   }
 }

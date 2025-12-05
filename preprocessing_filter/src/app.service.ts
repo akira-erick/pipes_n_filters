@@ -1,9 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { RunRequest } from './types';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  private readonly port: number
+
+  constructor(private configService: ConfigService) {
+    this.port = this.configService.get<number>('NEXT_PIPE_PORT') || 3002;
+  }
+
+  run(body: RunRequest): string {
+
+    const type = body.processingType;
+    let parameter: number;
+
+    switch (type) {
+      case 'light':
+        parameter = 300;
+        break;
+      case 'medium':
+        parameter = 800;
+        break;
+      case 'heavy':
+        parameter = 1200;
+        break;
+      default:
+        parameter = 300;
+    }
+
+    const processed = this.generateGaussianKernel(parameter, parameter);
+
+    fetch(`http://transformation-filter:${this.port}/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({processingType: type}),
+    }).catch((error) => {console.log('Error forwarding to transformation filter', error);});
+
+    return 'sent';
   }
 
   private generateGaussianKernel(size: number, sigma: number): number[][] {

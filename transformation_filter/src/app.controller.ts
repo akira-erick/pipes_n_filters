@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import type { RunRequest } from './types';
 
 //Naive Matrix Multiplication
 /*
@@ -12,8 +13,11 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('/run')
+    async run(@Body() body: RunRequest) {
+    console.log('Running transformation_filter with type:', body.processingType);
+    this.appService.run(body);
+    console.log('transformation_filter run completed');
+    return { received: true };
   }
 }
