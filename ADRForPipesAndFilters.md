@@ -15,14 +15,14 @@ O sistema será dividido em três filtros principais:
 2.  **Transformation Filter**: Aplica modificações estruturais ou artísticas.
 3.  **AI Filter**: Realiza inferências ou processamentos inteligentes finais.
 
-A comunicação entre os filtros deve ser assíncrona (preferencialmente via filas como RabbitMQ ou Kafka, ou via TCP/HTTP direto se a latência permitir), onde a saída de um serviço torna-se a entrada do próximo.
+A comunicação entre os filtros deve ser assíncrona , onde a saída de um serviço torna-se a entrada do próximo.
 
 ## Consequências
 
 ### Positivas
 * **Escalabilidade Independente**: Se o módulo de IA for lento, podemos escalar apenas ele horizontalmente sem duplicar o módulo de pré-processamento.
 * **Reusabilidade**: Os filtros podem ser reorganizados para criar novos pipelines.
-* **Manutenibilidade**: Cada serviço NestJS foca em uma única responsabilidade (SRP).
+* **Manutenibilidade**: Cada serviço NestJS foca em uma única responsabilidade.
 
 ### Negativas
 * **Complexidade de Infraestrutura**: Requer gerenciamento de 3 aplicações separadas em vez de uma.
