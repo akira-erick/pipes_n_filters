@@ -17,13 +17,13 @@ export class AppService {
 
     switch (type) {
       case 'light':
-        parameter = 300;
+        parameter = 600;
         break;
       case 'medium':
-        parameter = 800;
+        parameter = 1600;
         break;
       case 'heavy':
-        parameter = 1200;
+        parameter = 2400;
         break;
       default:
         parameter = 300;

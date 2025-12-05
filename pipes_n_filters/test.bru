@@ -4,10 +4,16 @@ meta {
   seq: 2
 }
 
-get {
-  url: 
-  body: none
+post {
+  url: http://localhost/preprocessing/run
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "processingType": "heavy"
+  }
 }
 
 settings {

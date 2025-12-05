@@ -1,49 +1,67 @@
 version: "3.9"
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-load-balancer
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  
+    ports:
+      - "80:80"
+    networks:
+      - filters
+    depends_on:
+      - preprocessing-filter
+      - transformation-filter
+      - ai-filter
+
   preprocessing-filter:
     build: ./preprocessing_filter
-    container_name: preprocessing-filter
     environment:
       SERVICE_PORT: 4001
       NEXT_PIPE_PORT: 4002
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-    ports:
-      - "4001:4001"
     networks:
       - filters
     depends_on:
       - otel-collector
-      - transformation-filter
+    deploy:
+      replicas: 2
+    ports:
+      - "4001"
+      - "4002"
 
   transformation-filter:
     build: ./transformation_filter
-    container_name: transformation-filter
     environment:
       SERVICE_PORT: 4002
       NEXT_PIPE_PORT: 4003
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-    ports:
-      - "4002:4002"
     networks:
       - filters
     depends_on:
       - otel-collector
-      - ai-filter
+    deploy:
+      replicas: 2
+    ports:
+      - "4002"
+      - "4003"
 
   ai-filter:
     build: ./ai_filter
-    container_name: ai-filter
     environment:
       SERVICE_PORT: 4003
       NEXT_PIPE_PORT: ""
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
-    ports:
-      - "4003:4003"
     networks:
       - filters
     depends_on:
       - otel-collector
+    deploy:
+      replicas: 2
+    ports:
+      - "4003"
+      - "4004" 
 
   otel-collector:
     container_name: otel-collector

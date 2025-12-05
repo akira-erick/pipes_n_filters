@@ -57,3 +57,18 @@ docker compose down -v
 2. Choose **Jaeger** from the data source dropdown.
 3. In the **Service** dropdown, select one of your services, like `preprocessing-filter`, `transformation-filter`, or `ai-filter`.
 4. You should see traces associated with the selected service.
+
+
+# Test it
+
+#### To test it and send a request:
+
+### POST - http://localhost/preprocessing/run
+
+type = 'light' | 'medium' | 'heavy' 
+
+```
+{
+  "processingType": "<type>"
+}
+```

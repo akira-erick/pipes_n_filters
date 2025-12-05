@@ -7,7 +7,7 @@ export class AppService {
   private readonly port: number
 
   constructor(private configService: ConfigService) {
-    this.port = this.configService.get<number>('NEXT_PIPE_PORT') || 3002;
+    this.port = this.configService.get<number>('NEXT_PIPE_PORT') || 4002;
   }
 
   run(body: RunRequest): string {
@@ -17,13 +17,13 @@ export class AppService {
 
     switch (type) {
       case 'light':
-        parameter = 150;
-        break;
-      case 'medium':
         parameter = 300;
         break;
-      case 'heavy':
+      case 'medium':
         parameter = 600;
+        break;
+      case 'heavy':
+        parameter = 1000;
         break;
       default:
         parameter = 150;
